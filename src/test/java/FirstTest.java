@@ -1,9 +1,13 @@
 import static io.restassured.RestAssured.*;
 import static org.hamcrest.Matchers.*;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import io.restassured.mapper.ObjectMapper;
 import io.restassured.mapper.ObjectMapperDeserializationContext;
 import io.restassured.mapper.ObjectMapperSerializationContext;
+import io.restassured.response.Response;
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
 public class FirstTest {
@@ -87,21 +91,27 @@ public class FirstTest {
 
     @Test
     public void SwagerAPIDemo(){
-
-//        ObjectMapper om = new ObjectMapper();
-//
-//        JSONArray array = new JSONArray();
-//        JsonObject JSONResponseBody = array.getJsonObject(0);
-
-        given().
+        JsonArray array = new JsonArray();
+        Response response = given().
                 baseUri("https://petstore.swagger.io/v2").
                 param("status", "sold").
         when().
-                get("/pet/findByStatus").
-        then().
-                log().all().
-//                assertThat().body("id[0]", equalTo("101"));
-                statusCode(200);
+                get("/pet/findByStatus");
+        JsonObject JSONResponseBody = new JsonObject(array.getAsJsonObject().get(response.body().asString()));
+//                .getAsJsonObject(response.body().asString());
+//        JSONResponseBody = response.body().asString();
+
+        System.out.println(JSONResponseBody);
+//
+//        given().
+//                baseUri("https://petstore.swagger.io/v2").
+//                param("status", "sold").
+//                when().
+//                get("/pet/findByStatus").
+//        then().
+//                log().all().
+//                statusCode(200);
+
     }
 
 }
