@@ -3,12 +3,18 @@ import static org.hamcrest.Matchers.*;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import io.restassured.common.mapper.TypeRef;
 import io.restassured.mapper.ObjectMapper;
 import io.restassured.mapper.ObjectMapperDeserializationContext;
 import io.restassured.mapper.ObjectMapperSerializationContext;
 import io.restassured.response.Response;
+import org.apache.http.HttpEntity;
+import org.apache.http.util.EntityUtils;
 import org.testng.Assert;
 import org.testng.annotations.Test;
+
+import java.util.List;
+import java.util.Map;
 
 public class FirstTest {
 
@@ -91,27 +97,16 @@ public class FirstTest {
 
     @Test
     public void SwagerAPIDemo(){
-        JsonArray array = new JsonArray();
+
         Response response = given().
                 baseUri("https://petstore.swagger.io/v2").
                 param("status", "sold").
         when().
                 get("/pet/findByStatus");
-        JsonObject JSONResponseBody = new JsonObject(array.getAsJsonObject().get(response.body().asString()));
-//                .getAsJsonObject(response.body().asString());
-//        JSONResponseBody = response.body().asString();
 
-        System.out.println(JSONResponseBody);
-//
-//        given().
-//                baseUri("https://petstore.swagger.io/v2").
-//                param("status", "sold").
-//                when().
-//                get("/pet/findByStatus").
-//        then().
-//                log().all().
-//                statusCode(200);
+        List<Map<String, Object>> JSONResponseObject = response.as(new TypeRef<List<Map<String, Object>>>() {});
 
+        System.out.println(JSONResponseObject.get(7).get("category"));
     }
 
 }
