@@ -84,19 +84,19 @@ public class FirstTest {
                 statusCode(200);
     }
 
-    @Test(enabled = false)
+    @Test
     public void DummyAPIDataExplorer(){
         given().
-                baseUri("https://dummyapi.io").
-                param("limit", 10).
+                baseUri("https://petstore.swagger.io/v2").
+                param("status", "sold").
         when().
-                get("/data/v1/user/").
+                get("/pet/findByStatus").
         then().
                 log().all();
     }
 
-    @Test
-    public void SwagerAPIDemo(){
+    @Test(enabled = false)
+    public void JSONArrayResponseTestAsListOfMap(){
 
         Response response = given().
                 baseUri("https://petstore.swagger.io/v2").
@@ -106,7 +106,23 @@ public class FirstTest {
 
         List<Map<String, Object>> JSONResponseObject = response.as(new TypeRef<List<Map<String, Object>>>() {});
 
+        Assert.assertEquals(JSONResponseObject.get(2).get("id"), 33249514);
         System.out.println(JSONResponseObject.get(7).get("category"));
+    }
+
+
+    @Test(enabled = true)
+    public void JSONArrayResponseTestAsJSONObject(){
+
+        Response response = given().
+                baseUri("https://petstore.swagger.io/v2").
+                param("status", "sold").
+                when().
+                get("/pet/findByStatus");
+
+        List<JsonObject> JSONArrayResponse = response.as(List.class);
+
+        System.out.println(JSONArrayResponse.get(10));
     }
 
 }
