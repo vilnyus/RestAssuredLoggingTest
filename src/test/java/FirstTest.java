@@ -3,10 +3,12 @@ import static org.hamcrest.Matchers.*;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import io.restassured.common.mapper.TypeRef;
 import io.restassured.mapper.ObjectMapper;
 import io.restassured.mapper.ObjectMapperDeserializationContext;
 import io.restassured.mapper.ObjectMapperSerializationContext;
+import io.restassured.path.json.JsonPath;
 import io.restassured.response.Response;
 import org.apache.http.HttpEntity;
 import org.apache.http.util.EntityUtils;
@@ -84,7 +86,7 @@ public class FirstTest {
                 statusCode(200);
     }
 
-    @Test
+    @Test(enabled = false)
     public void DummyAPIDataExplorer(){
         given().
                 baseUri("https://petstore.swagger.io/v2").
@@ -111,7 +113,7 @@ public class FirstTest {
     }
 
 
-    @Test(enabled = true)
+    @Test(enabled = false)
     public void JSONArrayResponseTestAsJSONObject(){
 
         Response response = given().
@@ -123,6 +125,55 @@ public class FirstTest {
         List<JsonObject> JSONArrayResponse = response.as(List.class);
 
         System.out.println(JSONArrayResponse.get(10));
+    }
+
+    @Test
+    public void JSONPathDemoTest(){
+        String simpleJson = "{\n" +
+                "   \"initAdaptiveTime\":{\n" +
+                "      \"lastUpdate\":1629849600,\n" +
+                "      \"metrics\":[\n" +
+                "         {\n" +
+                "            \"count\":11,\n" +
+                "            \"total\":3296\n" +
+                "         },\n" +
+                "         {\n" +
+                "            \"count\":0,\n" +
+                "            \"total\":0\n" +
+                "         }\n" +
+                "      ]\n" +
+                "   },\n" +
+                "   \"clientProcessTime\":{\n" +
+                "      \"lastUpdate\":1629849600,\n" +
+                "      \"metrics\":[\n" +
+                "         {\n" +
+                "            \"count\":6,\n" +
+                "            \"total\":2635\n" +
+                "         },\n" +
+                "         {\n" +
+                "            \"count\":0,\n" +
+                "            \"total\":0\n" +
+                "         }\n" +
+                "      ]\n" +
+                "   }\n" +
+                "}";
+
+        JsonPath json = new JsonPath(simpleJson);
+
+        String updateTIme = json.getString("initAdaptiveTime.lastUpdate");
+        System.out.println(updateTIme);
+
+        Object jsonPath = json.get("initAdaptiveTime");
+        System.out.println(jsonPath);
+
+        System.out.println((Object)json.get("$"));
+        System.out.println(json.getString("$"));
+
+        System.out.println((Object)json.get());
+        System.out.println(json.getString(""));
+        int lastUpdate = json.getInt("initAdaptiveTime.lastUpdate");
+        System.out.print(lastUpdate);
+
     }
 
 }
