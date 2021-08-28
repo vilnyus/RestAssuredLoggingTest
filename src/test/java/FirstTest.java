@@ -4,21 +4,51 @@ import static org.hamcrest.Matchers.*;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import io.restassured.RestAssured;
+import io.restassured.builder.RequestSpecBuilder;
+import io.restassured.builder.ResponseSpecBuilder;
 import io.restassured.common.mapper.TypeRef;
+import io.restassured.filter.log.LogDetail;
+import io.restassured.http.ContentType;
 import io.restassured.mapper.ObjectMapper;
 import io.restassured.mapper.ObjectMapperDeserializationContext;
 import io.restassured.mapper.ObjectMapperSerializationContext;
 import io.restassured.path.json.JsonPath;
 import io.restassured.response.Response;
+import io.restassured.specification.RequestSpecification;
+import io.restassured.specification.ResponseSpecification;
 import org.apache.http.HttpEntity;
 import org.apache.http.util.EntityUtils;
 import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class FirstTest {
+
+    ResponseSpecification customeResponseSpecification;
+
+    @BeforeClass
+    public void beforeClass(){
+        RequestSpecBuilder requestSpecBuilder = new RequestSpecBuilder().
+                setBaseUri("https://4ac3cd9b-bc5c-4c26-8431-3be472e9b042.mock.pstmn.io/").
+                addHeader("x-mock-match-request-body", "true").
+                setContentType("application/json;charset=utf-8").
+                log(LogDetail.ALL);
+
+        RestAssured.requestSpecification = requestSpecBuilder.build();
+
+        ResponseSpecBuilder responseSpecBuilder = new ResponseSpecBuilder().
+                expectStatusCode(200).
+                expectContentType(ContentType.JSON).
+                log(LogDetail.ALL);
+
+       customeResponseSpecification = responseSpecBuilder.build();
+    }
 
     @Test(enabled = false)
     public void TestLogging(){
@@ -127,7 +157,7 @@ public class FirstTest {
         System.out.println(JSONArrayResponse.get(10));
     }
 
-    @Test
+    @Test(enabled = false)
     public void JSONPathDemoTest(){
         String simpleJson = "{\n" +
                 "   \"initAdaptiveTime\":{\n" +
@@ -176,4 +206,30 @@ public class FirstTest {
 
     }
 
+    @Test
+    public void SendComplexJsonDemo(){
+
+        HashMap<String, Object> mainHashmap = new HashMap<String, Object>();
+
+        HashMap<String, String> usersParams = new HashMap<String, String>();
+        usersParams.put("first_name", "Quynn");
+        usersParams.put("last_name", "Contreras");
+        usersParams.put("phone", "1-971-977-4681");
+        usersParams.put("site", "1");
+
+        HashMap<String, String> sitesNameList = new HashMap<String, String>();
+        sitesNameList.put("name", "Edinburgh");
+
+        mainHashmap.put("DT_RowId", "row_1");
+        mainHashmap.put("users", usersParams);
+        mainHashmap.put("sites", sitesNameList);
+
+        given(requestSpecification).
+                body(mainHashmap).
+        when().post("post").
+        then().
+                spec(customeResponseSpecification).
+                log().all().
+                assertThat().statusCode(200);
+    }
 }
