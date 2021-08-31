@@ -33,7 +33,7 @@ public class FirstTest {
 
     ResponseSpecification customResponseSpecification;
 
-    @BeforeClass(enabled = true)
+    @BeforeClass(enabled = false)
     public void beforeClass(){
         RequestSpecBuilder requestSpecBuilder = new RequestSpecBuilder().
                 setBaseUri("https://4ac3cd9b-bc5c-4c26-8431-3be472e9b042.mock.pstmn.io/").
@@ -235,7 +235,7 @@ public class FirstTest {
                 assertThat().statusCode(200);
     }
 
-    @Test
+    @Test(enabled = false)
     public void validate_post_request_payload_from_file_non_BDD_style(){
         File file = new File("src\\main\\resources\\CreateWorkspacePayload.json");
 
@@ -251,4 +251,25 @@ public class FirstTest {
                 body("message", equalTo("Success"));
 
     }
+
+
+    @Test
+    public void validate_post_request_payload_from_file_BDD_style(){
+        File file = new File("src\\main\\resources\\CreateWorkspacePayload.json");
+
+        given().
+            baseUri("https://4ac3cd9b-bc5c-4c26-8431-3be472e9b042.mock.pstmn.io/").
+//            header("x-mock-match-request-body", "true").  //Header gives error
+            contentType("application/json;charset=utf-8").
+            contentType(ContentType.JSON).
+            body(file).
+        when().
+            post("/post").
+        then().
+            log().all().
+            assertThat().
+            statusCode(200).
+            body("message", equalTo("Success"));
+    }
+
 }
