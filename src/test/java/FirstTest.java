@@ -23,6 +23,7 @@ import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -30,9 +31,9 @@ import java.util.Map;
 
 public class FirstTest {
 
-    ResponseSpecification customeResponseSpecification;
+    ResponseSpecification customResponseSpecification;
 
-    @BeforeClass
+    @BeforeClass(enabled = true)
     public void beforeClass(){
         RequestSpecBuilder requestSpecBuilder = new RequestSpecBuilder().
                 setBaseUri("https://4ac3cd9b-bc5c-4c26-8431-3be472e9b042.mock.pstmn.io/").
@@ -47,7 +48,7 @@ public class FirstTest {
                 expectContentType(ContentType.JSON).
                 log(LogDetail.ALL);
 
-       customeResponseSpecification = responseSpecBuilder.build();
+       customResponseSpecification = responseSpecBuilder.build();
     }
 
     @Test(enabled = false)
@@ -198,15 +199,16 @@ public class FirstTest {
 
         System.out.println((Object)json.get("$"));
         System.out.println(json.getString("$"));
-
+        System.out.println((Object)json.get("initAdaptiveTime.metrics[1]"));
         System.out.println((Object)json.get());
+
         System.out.println(json.getString(""));
         int lastUpdate = json.getInt("initAdaptiveTime.lastUpdate");
         System.out.print(lastUpdate);
 
     }
 
-    @Test
+    @Test(enabled = false)
     public void SendComplexJsonDemo(){
 
         HashMap<String, Object> mainHashmap = new HashMap<String, Object>();
@@ -228,8 +230,25 @@ public class FirstTest {
                 body(mainHashmap).
         when().post("post").
         then().
-                spec(customeResponseSpecification).
+                spec(customResponseSpecification).
                 log().all().
                 assertThat().statusCode(200);
+    }
+
+    @Test
+    public void validate_post_request_payload_from_file_non_BDD_style(){
+        File file = new File("src\\main\\resources\\CreateWorkspacePayload.json");
+
+        given(requestSpecification).
+                body(file).
+        when().
+                post("post").
+        then().
+                spec(customResponseSpecification).
+                log().body().
+                assertThat().
+                statusCode(200).
+                body("message", equalTo("Success"));
+
     }
 }
