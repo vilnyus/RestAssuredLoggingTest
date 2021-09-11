@@ -24,6 +24,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.io.File;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -253,7 +254,7 @@ public class FirstTest {
     }
 
 
-    @Test
+    @Test(enabled = false)
     public void validate_post_request_payload_from_file_BDD_style(){
         File file = new File("src\\main\\resources\\CreateWorkspacePayload.json");
 
@@ -272,4 +273,24 @@ public class FirstTest {
             body("message", equalTo("Success"));
     }
 
+    @Test
+    public void multiple_query_parameters() {
+        HashMap<String, String> queryParams = new HashMap<>();
+        queryParams.put("name", "Doromo");
+        queryParams.put("password", "X@!oi8");
+        queryParams.put("Message", "not today");
+
+
+        given().
+            baseUri("https://postman-echo.com/").
+            queryParam("name", "Doromo").
+            queryParam("password", "X^&%jjjhhjHH").
+            queryParams(queryParams).
+        when().
+            get("/get").
+        then().
+            log().all().
+            assertThat().
+            statusCode(200);
+    }
 }
