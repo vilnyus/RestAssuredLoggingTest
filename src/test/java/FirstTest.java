@@ -326,20 +326,39 @@ public class FirstTest {
 
     }
 
-    @Test
+    @Test(enabled = false)
     public void download_file() throws IOException {
         byte[] bytes = given().
-                baseUri("https://raw.githubusercontent.com/").
-                log().all().
-        when().
-                get("appium/appium/master/sample-code/apps/ApiDemos-debug.apk").
-        then().
-                log().all().
-                extract().
-                asByteArray();
+                    baseUri("https://raw.githubusercontent.com/").
+                    log().all().
+                when().
+                    get("appium/appium/master/sample-code/apps/ApiDemos-debug.apk").
+                then().
+                    log().all().
+                    extract().asByteArray();
 
         OutputStream os = new FileOutputStream(new File("ApiDemos-debug.apk"));
 
+        os.write(bytes);
+        os.close();
+    }
+
+    @Test
+    public void download_file_alternative() throws IOException {
+        InputStream is = given().
+                    baseUri("https://raw.githubusercontent.com/").
+                    log().all().
+                when().
+                    get("appium/appium/master/sample-code/apps/ApiDemos-debug.apk").
+                then().
+//                log().all().
+                    assertThat().statusCode(200).
+                    extract().asInputStream();
+
+        OutputStream os = new FileOutputStream(new File("ApiDemos-debug.apk"));
+
+        byte[] bytes = new byte[is.available()];
+        is.read(bytes);
         os.write(bytes);
         os.close();
     }
