@@ -294,7 +294,7 @@ public class FirstTest {
             statusCode(200);
     }
 
-    @Test(enabled = true)
+    @Test(enabled = false)
     public void multipart_form_data(){
         given().
                 baseUri("https://postman-echo.com/").
@@ -307,5 +307,22 @@ public class FirstTest {
                 log().all().
                 assertThat().
                 statusCode(200);
+    }
+
+    @Test
+    public void upload_file_multipart_form_data(){
+        String attributes = "{\"name\": \"text.txt\", \"parent\": {\"id\": \"14521456\"}}";
+        given().
+                baseUri("https://postman-echo.com/").
+                multiPart("file", new File("src/main/resources/temp.txt")).
+                multiPart("attributes", attributes, "application/json").
+                log().all().
+        when().
+                post("/post").
+        then().
+                log().all().
+                assertThat().
+                statusCode(200);
+
     }
 }
