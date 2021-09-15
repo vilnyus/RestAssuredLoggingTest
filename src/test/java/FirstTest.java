@@ -273,7 +273,7 @@ public class FirstTest {
             body("message", equalTo("Success"));
     }
 
-    @Test
+    @Test(enabled = false)
     public void multiple_query_parameters() {
         HashMap<String, String> queryParams = new HashMap<>();
         queryParams.put("name", "Doromo");
@@ -294,10 +294,13 @@ public class FirstTest {
             statusCode(200);
     }
 
-    @Test
+    @Test(enabled = true)
     public void multipart_form_data(){
         given().
                 baseUri("https://postman-echo.com/").
+                multiPart("param1", "value1").
+                multiPart("param2", "value2").
+                multiPart("param3", "value3").
         when().
                 post("/post").
         then().
