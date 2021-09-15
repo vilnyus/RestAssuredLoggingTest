@@ -293,4 +293,16 @@ public class FirstTest {
             assertThat().
             statusCode(200);
     }
+
+    @Test
+    public void multipart_form_data(){
+        given().
+                baseUri("https://postman-echo.com/").
+        when().
+                post("/post").
+        then().
+                log().all().
+                assertThat().
+                statusCode(200);
+    }
 }
