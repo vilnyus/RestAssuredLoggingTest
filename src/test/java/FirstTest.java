@@ -23,7 +23,7 @@ import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import java.io.File;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -309,7 +309,7 @@ public class FirstTest {
                 statusCode(200);
     }
 
-    @Test
+    @Test(enabled = false)
     public void upload_file_multipart_form_data(){
         String attributes = "{\"name\": \"text.txt\", \"parent\": {\"id\": \"14521456\"}}";
         given().
@@ -324,5 +324,23 @@ public class FirstTest {
                 assertThat().
                 statusCode(200);
 
+    }
+
+    @Test
+    public void download_file() throws IOException {
+        byte[] bytes = given().
+                baseUri("https://raw.githubusercontent.com/").
+                log().all().
+        when().
+                get("appium/appium/master/sample-code/apps/ApiDemos-debug.apk").
+        then().
+                log().all().
+                extract().
+                asByteArray();
+
+        OutputStream os = new FileOutputStream(new File("ApiDemos-debug.apk"));
+
+        os.write(bytes);
+        os.close();
     }
 }
